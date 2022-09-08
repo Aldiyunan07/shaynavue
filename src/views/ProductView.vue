@@ -103,12 +103,15 @@
           "img/products/man-2.jpg",
           "img/products/man-3.jpg",
           "img/products/man-4.jpg"
-        ]
+        ],
+        idProduct:this.$route.params.id
       }
     },
     methods: {
       changeImage(urlImage){
         this.gambar_default = urlImage;
+        // eslint-disable-next-line no-console
+        console.log(this.idProduct);
       }
     }
   }
