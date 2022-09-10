@@ -52,7 +52,23 @@ export default {
             products : [],
             keranjangUser : [],
         };
+    },    
+    
+    mounted(){
+        axios
+        .get("http://localhost:8000/api/products")
+        .then(res => (this.products = res.data.meta.data.data))
+        .catch(err => console.log(err));
+        
+        if (localStorage.getItem('keranjangUser')){ // Jika di get item dari local storage ada
+            try{
+                this.keranjangUser = JSON.parse(localStorage.getItem('keranjangUser')); // maka simpan data dari local storage ke variable keranjangUser
+            }catch(e){
+                localStorage.removeItem('keranjangUser'); // Ku tak tahu
+            }
+        }
     },
+
     methods:{
         saveKeranjang(idProduct, nameProduct, priceProduct, photoProduct){ // function saveKeranjang
             var productStorage = { // Membuat variabel producStorage
@@ -64,21 +80,9 @@ export default {
             this.keranjangUser.push(productStorage); // Menambahkan data variabel productstorage ke var keranjanguser
             const parsed = JSON.stringify(this.keranjangUser); // me refresh data yang sudah di masukkan tadi
             localStorage.setItem('keranjangUser', parsed);
+            window.location.reload();
         }
 
-    },
-    mounted(){
-        if (localStorage.getItem('keranjangUser')){ // Jika di get item dari local storage ada
-            try{
-                this.keranjangUser = JSON.parse(localStorage.getItem('keranjangUser')); // maka simpan data dari local storage ke variable keranjangUser
-            }catch(e){
-                localStorage.removeItem('keranjangUser'); // Ku tak tahu
-            }
-        }
-        axios
-        .get("http://localhost:8000/api/products")
-        .then(res => (this.products = res.data.meta.data.data))
-        .catch(err => console.log(err));
     }
 };
 </script>

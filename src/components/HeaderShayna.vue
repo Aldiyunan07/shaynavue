@@ -46,7 +46,7 @@
                                                                 <h6>{{ keranjang.name }}</h6>
                                                             </div>
                                                         </td>
-                                                        <td class="si-close" @click="removeItem(keranjangUser.index)">
+                                                        <td class="si-close" @click="removeItem(keranjang.id)">
                                                             <i class="ti-close"></i>
                                                         </td>
                                                     </tr>  
@@ -86,10 +86,26 @@
                 };
         },
         methods: {
-            removeItem(index){ // Function menghapus item dengan parameter index 
-                this.keranjangUser.splice(index, 1); // Memotong item dari local storage
+            removeItem(idx){ // Function menghapus item dengan parameter index 
+                // this.keranjangUser.splice(index, 1); // Memotong item dari local storage
+                // const parsed = JSON.stringify(this.keranjangUser); // 2 line me refresh kembali perubahan yang sudah terjadi
+                // localStorage.setItem('keranjangUser', parsed);
+
+                // Cari Tahu id dari si item yang akan di hapus
+                let keranjangUserStorage = JSON.parse(localStorage.getItem("keranjangUser")); // Get data keranjang 
+                let itemKeranjangUserStorage = keranjangUserStorage.map(itemKeranjangUserStorage => itemKeranjangUserStorage.id); // Me listing kembali data array dan mendapatkan data yang di pilih
+                
+                // cocokan idx item dengan id yang di peroleh 
+                let index = itemKeranjangUserStorage.findIndex(id => id == idx); // mencari data yang di maksud dengan menggunakan id yang di dapat
+                this.keranjangUser.splice(index, 1); // Hapus data yang ada di dalam local storage
+                // .splice(index, 1)
+                // index = id dari si item yang akan di hapus 
+                // 1 = jumlah data yang akan di hapus 
+
+                // Update terkini dari local storage 
                 const parsed = JSON.stringify(this.keranjangUser); // 2 line me refresh kembali perubahan yang sudah terjadi
                 localStorage.setItem('keranjangUser', parsed);
+                window.location.reload();
 
             }
         },
