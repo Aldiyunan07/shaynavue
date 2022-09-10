@@ -43,13 +43,13 @@
                                     <h3>{{ productDetails.name }}</h3>
                                 </div>
                                 <div class="pd-desc">
-                                    <p>
-                                        {{ productDetails.description }}
-                                    </p>
+                                    <p v-html="productDetails.description"></p>
                                     <h4>${{ productDetails.price }}</h4>
                                 </div>
                                 <div class="quantity">
-                                    <router-link to="/cart" class="primary-btn pd-cart">Add To Cart</router-link>
+                                    <router-link to="/cart" class="primary-btn pd-cart">
+                                        <a href="#" @click="saveKeranjang(productDetails.id, productDetails.name, productDetails.price, productDetails.gallery[0].photo)" class="primary-btn pd-cart"> Add To Cart </a>
+                                    </router-link>
                                 </div>
                             </div>
                         </div>
@@ -82,34 +82,47 @@
     },
     data() {
       return {
-        gambar_default:"",
-        thumbs : [
-          "img/products/man-1.jpg",
-          "img/products/man-2.jpg",
-          "img/products/man-3.jpg",
-          "img/products/man-4.jpg"
-        ],
-        productDetails : []
-    }
+        gambar_default:"",  // membuat variabel kosong 
+        productDetails : [], // sama saja tapi bertipe array
+        keranjangUser :[]
+        };
     },
     methods: {
-      changeImage(urlImage){
-        this.gambar_default = urlImage;
-      },
-        setDataPicture(data){
-            this.productDetails = data;
-            this.gambar_default = data.gallery[0].photo;
+        changeImage(urlImage){ // Membuat function dengan get url image
+            this.gambar_default = urlImage; // mendefinisikan variabel dengan url image
         },
+        setDataPicture(data){ // Membuat function dengan set data picture
+            this.productDetails = data; // mendefinisikan variabel productdetail dengan data hasil get
+            this.gambar_default = data.gallery[0].photo; // mendefinisikan variabel dengan isi array dari get data
+        },
+        saveKeranjang(idProduct, nameProduct, priceProduct, photoProduct){ // function saveKeranjang
+            var productStorage = { // Membuat variabel producStorage
+                "id" : idProduct,
+                "name" : nameProduct,
+                "price" : priceProduct,
+                "photo" : photoProduct
+            }
+            this.keranjangUser.push(productStorage); // Menambahkan data variabel productstorage ke var keranjanguser
+            const parsed = JSON.stringify(this.keranjangUser); // me refresh data yang sudah di masukkan tadi
+            localStorage.setItem('keranjangUser', parsed);
+        }
     },
     mounted(){
+        if (localStorage.getItem('keranjangUser')){ // Jika di get item dari local storage ada
+            try{
+                this.keranjangUser = JSON.parse(localStorage.getItem('keranjangUser')); // maka simpan data dari local storage ke variable keranjangUser
+            }catch(e){
+                localStorage.removeItem('keranjangUser'); // Ku tak tahu
+            }
+        }
         axios
-        .get("http://localhost:8000/api/products",{
-            params:{
-                id: this.$route.params.id
+        .get("http://localhost:8000/api/products",{ // get data dari url
+            params:{ // Mendefinisikan parameter
+                id: this.$route.params.id  // mengisi parameter id dengan hasil get dari index
             }
         })
-        .then(res => (this.setDataPicture(res.data.meta.data)))
-        .catch(err => console.log(err));
+        .then(res => (this.setDataPicture(res.data.meta.data))) // get data dari API
+        .catch(err => console.log(err)); // Jika terjadi error maka akan di beritahukan di console.log
     }
   }
 </script>

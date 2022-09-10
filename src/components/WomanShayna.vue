@@ -8,8 +8,8 @@
                             <div class="pi-pic">
                                 <img v-bind:src="itemProduct.gallery[0].photo" alt="" />
                                 <ul>
-                                    <li class="w-icon active">
-                                        <a href="#"><i class="icon_bag_alt"></i></a>
+                                    <li class="w-icon active" @click="saveKeranjang(itemProduct.id, itemProduct.name, itemProduct.price, itemProduct.gallery[0].photo)">
+                                        <a href="#"> <i class="icon_bag_alt"></i> </a>
                                     </li>
                                     <li class="quick-view">
                                         <router-link v-bind:to="'/product/'+itemProduct.id">
@@ -49,10 +49,32 @@ export default {
     },
     data() {
         return {
-            products : []
+            products : [],
+            keranjangUser : [],
         };
     },
+    methods:{
+        saveKeranjang(idProduct, nameProduct, priceProduct, photoProduct){ // function saveKeranjang
+            var productStorage = { // Membuat variabel producStorage
+                "id" : idProduct,
+                "name" : nameProduct,
+                "price" : priceProduct,
+                "photo" : photoProduct
+            }
+            this.keranjangUser.push(productStorage); // Menambahkan data variabel productstorage ke var keranjanguser
+            const parsed = JSON.stringify(this.keranjangUser); // me refresh data yang sudah di masukkan tadi
+            localStorage.setItem('keranjangUser', parsed);
+        }
+
+    },
     mounted(){
+        if (localStorage.getItem('keranjangUser')){ // Jika di get item dari local storage ada
+            try{
+                this.keranjangUser = JSON.parse(localStorage.getItem('keranjangUser')); // maka simpan data dari local storage ke variable keranjangUser
+            }catch(e){
+                localStorage.removeItem('keranjangUser'); // Ku tak tahu
+            }
+        }
         axios
         .get("http://localhost:8000/api/products")
         .then(res => (this.products = res.data.meta.data.data))
